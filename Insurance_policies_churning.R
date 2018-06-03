@@ -1,14 +1,12 @@
-
+#Summary and Structure of the dataset
 summary(Travelers_data)
-
 str(Travelers_data) #Check the data types
 
 #Checking the missing values in each column
 colSums(is.na(Travelers_data))
 
 
-
-                                ###################Exploring MISSING VALUES#########################
+##Exploring MISSING VALUES
 library(Rcpp)
 library(mice)
 
@@ -23,8 +21,7 @@ mice_plot = aggr(Travelers_data, sortVars=TRUE,
                  gap=3, ylab=c("Missing data","Pattern"))
 
 
-
-                                #########IMPUTING THE MISSING VALUES IN NUMERICAL COLUMNS############
+#IMPUTING THE MISSING VALUES IN NUMERICAL COLUMNS
 library(Rcpp)
 library(mice)
 
@@ -54,8 +51,7 @@ Travelers_data$claim.ind=imputed$claim.ind
 colSums(is.na(Travelers_data))
 
 
-
-                               ############# impute with random value in the Categorical Column #############
+### impute with random value in the Categorical Column 
 
 colSums(is.na(Travelers_data))
 install.packages("Hmisc")
@@ -74,7 +70,7 @@ Travelers_data$ni.marital.status = with(Travelers_data, impute(ni.marital.status
 colSums(is.na(Travelers_data))
 
 
-                                      ############# DATA HAS NO MISSING VALUES #########
+### NOW, DATA HAS NO MISSING VALUES ###
 
 
 #finding the number of rows having missing data in the Dataset
@@ -97,11 +93,9 @@ Travelers_data = Travelers_data[complete.cases(Travelers_data$sales.channel), ]
 #Travelers_data=na.omit(Travelers_data)
 
 
-#############Merging Rows ##########################
-#DATA=bind_rows(Suggestion1,Suggestion2)
 
 
-########################### PRE PROCESSING #################
+## PRE PROCESSING ##
 
 #Encoding male as 1 and Female as 0
 
@@ -115,7 +109,7 @@ library(readr)
 library(lubridate)
 library(tidyr)
 
-# TO handle date and time ######################################################################
+# TO handle date and time 
 #Travelers_data = mutate(Travelers_data, Day = day(Travelers_data$year))
 #Travelers_data = mutate(Travelers_data, diff_between = difftime(Stoptime_variable , Starttime_variable, units = "secs"))
 
@@ -132,8 +126,7 @@ library(tidyr)
   #summarise(count = n())
 
 
-
-                          ##################      FEATURE ENGINEERING       #####################
+####      FEATURE ENGINEERING       ####
 Travelers_data$total_burden=Travelers_data$n.adults+Travelers_data$n.children
 Travelers_data$age_lenatres=Travelers_data$ni.age- Travelers_data$len.at.res
 
@@ -154,7 +147,7 @@ Travelers_data=Travelers_data[, -c(20,1)]
 
 
 
-##### #########       Focus on  DEPENDENT VARIABLE       #############################
+#####      Focus on  DEPENDENT VARIABLE       #####
 
 
 barchart(Travelers_data$cancel)
@@ -169,17 +162,13 @@ Travelers_data= subset(Travelers_data, Travelers_data$cancel >=0)
 Travelers_data$cancel=as.factor(as.character(Travelers_data$cancel))
 
 
-
-
-
-                                         #############Correlations among variables###########
+#######Correlations among variables#######
 D=data.frame(Travelers_data[,c("tenure","n.adults","n.children","ni.marital.status","premium","len.at.res","ni.age","year")])
 cor(D)
 
 
 
-
-                                         ############## Splitting the Data Set ##############
+######## Splitting the Data Set ######
 ratio = sample(1:nrow(Travelers_data), size = 0.25*nrow(Travelers_data))
 Test = Travelers_data[ratio,] #Test dataset 25% of total
 Training = Travelers_data[-ratio,] #Train dataset 75% of total
@@ -187,7 +176,7 @@ Training = Travelers_data[-ratio,] #Train dataset 75% of total
 
 
 
-###### MODEL 1 : LOGISTIC REGRESSION ######################################
+###### MODEL 1 : LOGISTIC REGRESSION ############
 detach(Travelers_data)
 attach(Training)
 
@@ -211,7 +200,7 @@ print(AUC@y.values)
 
 
 
-###### MODEL 2 : DECISION TREES ##############################
+###### MODEL 2 : DECISION TREES #########
 
 
 library(rpart)
@@ -242,7 +231,7 @@ print(AUC@y.values)
 
 
 
-################## MODEL 3: XG Boost####
+####### MODEL 3: XG Boost####
 
 #Packages
 install.packages("xgboost")
@@ -346,7 +335,7 @@ xgb.plot.importance (importance_matrix = mat[1:20])
 
 
 
-########### MODEL 4: Bagging  #####
+########### MODEL 4: Bagging  ########
 
 
 #load libraries 
@@ -404,7 +393,7 @@ r <- resample(learner = bag.lrn , task = traintask, resampling = rdesc, measures
 
 
 
-# ###############  MODEL 5: RANDOM FOREST################
+##########  MODEL 5: RANDOM FOREST########
 
 #make randomForest learner
 rf.lrn <- makeLearner("classif.randomForest")
